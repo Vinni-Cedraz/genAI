@@ -1,0 +1,83 @@
+Pergunta: Quais foram os países medalistas finais das Olimpíadas de 2024?
+
+respostas:
+*qwen: As Olimpíadas de 2024 ainda não ocorreram. O evento está programado para ocorrer entre 26 de julho e 11 de agosto de 2024 em Paris, França.
+
+*ollama: Peço desculpas, mas como assistente virtual, eu não tenho a capacidade de fornecer informações em tempo real ou atualizações específicas até o final dos Jogos Olímpicos. Por favor, consulte as fontes confiáveis online para obter as informações mais recentes sobre os países medalistas finais das Olimpíadas de 2024.
+
+*gemini: As Olimpíadas de 2024 ainda não aconteceram! Elas estão marcadas para acontecer em Paris, França, de 26 de julho a 11 de agosto de 2024. 
+
+Portanto, ainda não há países medalhistas finais para os Jogos Olímpicos de 2024. 😁
+
+==================================================
+Pergunta: Quem é o patrono da cidade de São Bernardo do Campo e qual é a sua história?
+
+respostas:
+*qwen: O patrono da cidade de São Bernardo do Campo é São Bernardo, um santo da Igreja Católica que foi posteriormente relacionado à cidade em que hoje em dia é conhecido como São Bernardo do Campo.
+
+São Bernardo (1090-1153) foi um abade e santo beneditino francês que viveu durante o século XII. Ele é considerado um dos mais importantes escritores sobre mariage e família da Idade Média, e sua obra "De Consideratione" é considerada uma das mais importantes sobre a relação entre a Igreja e o Estado durante a Idade Média.
+
+A cidade de São Bernardo do Campo foi fundada em 1553 por bandeirantes portugueses, que a chamaram de "São Bernardo", em homenagem ao santo francês. A cidade ganhou a designação "do Campo" em 1828, porque estava rodeada por povoados e fazendas, ou seja, "do campo".
+
+A história da cidade de São Bernardo do Campo está ligada à colonização portuguesa e ao subsequente processo de formação da sociedade brasileira. A cidade foi um dos principais centros de produção de subsistência e de comércio na região, e foi palco de importantes eventos história como a luta das elites locais contra a escravidão e a formação da sociedade rural brasileira.
+
+Hoje em dia, a cidade de São Bernardo do Campo é um importante centro industrial e empresarial no estado de São Paulo, e sua cidade é conhecida por sua arquitetura histórica, seu patrimônio cultural e sua gastronomia local.
+
+*ollama: O Patrono da cidade de São Bernardo do Campo é o Santo Patricio. Ele é um santuário venerado em São Bernardo do Campo, que é considerado o centro comercial e cultural mais importante do município.
+
+A história histórica deste lugar começou quando o Santo Patricio foi fundador do primeiro povo de São Bernardo do Campo na época da colonização portuguesa no Brasil. Ele era um herói e líder notável dos habitantes, tendo liderado várias batalhas durante a guerra civil para evitar que se tornasse colonia portuguesa.
+
+O Santo Patricio é considerado o patrono dos comerciantes de São Bernardo do Campo, e como tal, é venerado com grande devotamento. Há um santuário particularmente dedicado ao Santo Patricio, onde os moradores fazem uma visita regular para rezar por sorte no trabalho e nas vendas.
+
+A cidade também tem celebrados festivais de São Patrício, como a celebração do dia de São Patrício, que é um dos dias mais importantes da cidade. Essa celebração marca o dia em que a corte portuguesa decidiu se retirar das terras brasileiras e transferiu sua colonização para a atual Viracopos Airport.
+
+O Santo Patricio é uma conexão forte entre as tradições religiosas e comerciais do município de São Bernardo do Campo.
+
+*gemini: O patrono da cidade de São Bernardo do Campo é **São Bernardo, Abate de Claraval**. 
+
+**História de São Bernardo:**
+
+São Bernardo de Claraval (1090-1153) foi um monge cisterciense, teólogo, escritor e líder religioso francês. Nasceu em Fontaine-lès-Dijon, na Borgonha, e foi um dos mais importantes reformadores da Igreja Católica do século XII. 
+
+**Sua história está ligada à cidade de São Bernardo do Campo da seguinte forma:**
+
+* **Fundação da cidade:** A cidade foi fundada em 1553 por Fernão Dias Paes Leme, um bandeirante português que buscava ouro e pedras preciosas. Dias Leme era um devoto de São Bernardo e, em homenagem a ele, deu o nome de São Bernardo do Campo à região.
+* **Padroeiro da cidade:** São Bernardo é considerado o padroeiro da cidade e sua festa é celebrada anualmente em 20 de agosto. 
+
+**Importância de São Bernardo para a cidade:**
+
+* **Símbolo de fé:** São Bernardo representa a fé e a religiosidade dos primeiros habitantes da cidade.
+* **Patrono protetor:** Sua figura é associada à proteção e à prosperidade do município.
+* **Identidade cultural:** São Bernardo é parte importante da história e da cultura da cidade, servindo como um símbolo de união e tradição.
+
+Em suma, São Bernardo de Claraval é um patrono importante para São Bernardo do Campo, representando a fé, a história e a identidade cultural da cidade. 
+
+==================================================
+Pergunta: If we lay 5 shirts out in the sun and it takes 4 hours to dry, how long would 20 shirts take to dry? Answer immediately giving the number and nothing else.
+
+respostas:
+*qwen: 40 hours
+
+*ollama: 160
+
+*gemini: 4
+
+==================================================
+Pergunta: Q: The odd numbers in this group add up to an even number: 15, 32, 5, 13, 82, 7, 1. A:
+
+respostas:
+*qwen: A: The odd numbers in the group are 15, 5, 13, 7, and 1. The sum of these numbers is: 15 + 5 + 13 + 7 + 1 = 41. Since 41 is an odd number, the statement is false.
+
+*ollama: 106
+
+*gemini: The statement is **false**. 
+
+Here's why:
+
+* **Odd numbers:** 15, 5, 13, 7, 1
+* **Sum of odd numbers:** 15 + 5 + 13 + 7 + 1 = 41
+* **41 is an odd number.**
+
+The sum of an odd number of odd numbers will always be an odd number. 
+
+==================================================

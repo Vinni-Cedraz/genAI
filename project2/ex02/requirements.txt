@@ -1,0 +1,8 @@
+certifi==2024.8.30
+charset-normalizer==3.3.2
+dewiki==0.1.0
+idna==3.10
+mwparserfromhell==0.6.6
+requests==2.32.3
+soupsieve==2.6
+urllib3==2.2.3

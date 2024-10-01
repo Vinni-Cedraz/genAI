@@ -1,0 +1,38 @@
+Software Engineer - Entry Level 
+São Paulo, São Paulo, Brazil · 1 day ago · Over 100 applicants
+RemoteMatches your job preferences, workplace type is Remote.  Full-timeMatches your job preferences, job type is Full-time.
+3 connections work here · 12 school alumni work here
+8 of 10 skills match your profile - you may be a good fit
+See how you compare to over 100 other applicants. Retry Premium for R$0
+
+Apply
+
+Save
+Save Software Engineer - Entry Level  at Microsoft
+Easily assess your fit and tailor your resume
+Stand out for almost 2x as many opportunities with exclusive Premium features. Cancel anytime.
+Retry Premium for R$0
+About the job
+Do you love Xbox and gaming? Do you want to be part of preserving the gaming history and culture for future generations? If so, join the Xbox Game Preservation team as an infrastructure developer and work on exciting and challenging projects with world class engineers. You will build new tooling and services to support the emulation efforts, which enable thousands of games to run on Xbox devices. You will also create new tooling to simplify our development and validation efforts and manage our build system.
+
+As an infrastructure engineer, you will have the opportunity to shape the future of our game preservation tooling and services. You will be responsible for creating new tools to make the team more efficient, own the maintenance of some of our existing tools, and support web portal development. You will leverage your technical and social skills to collaborate with team members and partners across the Xbox organization.
+
+Microsoft’s mission is to empower every person and every organization on the planet to achieve more. As employees we come together with a growth mindset, innovate to empower others, and collaborate to realize our shared goals. Each day we build on our values of respect, integrity, and accountability to create a culture of inclusion where everyone can thrive at work and beyond.
+
+Responsibilities
+
+Develop high quality maintainable tools that increase efficiency within the team.
+Be an active participant in team direction and development discussions.
+Use your social skills to collaborate with team members and partners 
+
+Qualifications
+
+Required:
+
+Bachelor's Degree in Computer Science, or related technical discipline.
+A deep understanding of .NET
+Proficient in C#
+Familiar with RESTful API services and cloud storage technologies.
+Able to communicate in English in both written and spoken form. (Upload resume in English)
+
+Microsoft is an equal opportunity employer. Consistent with applicable law, all qualified applicants will receive consideration for employment without regard to age, ancestry, citizenship, color, family or medical care leave, gender identity or expression, genetic information, immigration status, marital status, medical condition, national origin, physical or mental disability, political affiliation, protected veteran or military status, race, ethnicity, religion, sex (including pregnancy), sexual orientation, or any other characteristic protected by applicable local laws, regulations and ordinances. If you need assistance and/or a reasonable accommodation due to a disability during the application process, read more about requesting accommodations.
