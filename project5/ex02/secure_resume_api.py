@@ -18,6 +18,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import uuid
 import logging
 import json
+from werkzeug.exceptions import TooManyRequests
 
 UPLOAD_FOLDER = "./pdfs_posted/"
 ALLOWED_EXTENSIONS = {"pdf"}
@@ -115,21 +116,17 @@ def register():
 @jwt_required()
 def search():
     query = request.args.get("query")
-    print(f"\n\n\n\nQUERY: {query}\n\n\n\n")
-    results = collection.query(query_texts=[query])
-    print(f"\n\n\n\n\nRESULTS: {results}\n\n\n\n\n")
+    results = collection.query(query_texts=[query], where_document={"$contains": query})
     response_data = []
     for i, result in enumerate(results["ids"][0]):
-        print(f"\n\n\n\nid: {result}\n\n\n\n")
-        content = results["documents"][0][i].replace("\n", "").replace("•", "")
-        if query in content:
-            response_data.append(
-                {
-                    "document": result.split("_chunk_")[0],
-                    "chunk": int(result.split("_chunk_")[1]),
-                    "content": content,
-                }
-            )
+        content = results["documents"][0][i].replace("\n", " ").replace("•", " ")
+        response_data.append(
+            {
+                "document": result.split("_chunk_")[0],
+                "chunk": int(result.split("_chunk_")[1]),
+                "content": content,
+            }
+        )
 
     print("Response:", json.dumps(response_data, indent=2, ensure_ascii=False))
     response = jsonify(response_data)
@@ -138,7 +135,7 @@ def search():
 
 
 @app.route("/upload_pdf", methods=["POST"])
-@limiter.limit("45/minute")
+@limiter.limit("20/minute")
 @jwt_required()
 @role_required(["candidate", "administrator"])
 def upload_file():
@@ -174,9 +171,8 @@ def upload_file():
                 collection.add(
                     documents=[chunk],
                     ids=[f"{file.filename}_chunk_{i}"],
-                    metadatas=[{"user_id": user_id}],
+                    metadatas=[{"source": file.filename}],
                 )
-                print(f"\n\n\n\n\n\nchunk number: {i}: {chunk}\n\n\n\n\n\n")
 
         return (
             jsonify(
@@ -235,10 +231,12 @@ def get_document_ids():
     return jsonify(document_ids), 200
 
 
-@app.errorhandler(Exception)
-def handle_exception(e):
-    logger.error(f"Unhandled exception: {str(e)}")
-    return jsonify({"error": "An unexpected error occurred"}), 500
+@app.errorhandler(TooManyRequests)
+def handle_too_many_requests(e):
+    return (
+        jsonify({"error": "Limit of requestes exceeded. Try again later."}),
+        429,
+    )
 
 
 @app.after_request

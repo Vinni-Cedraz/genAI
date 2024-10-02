@@ -29,6 +29,7 @@ for pdf_file in pdf_files:
     with open(f'resumes/{pdf_file}', 'rb') as f:
         upload_response = requests.post(f"{api_url}/upload_pdf", headers={"Authorization": f"Bearer {access_token}"}, files={"file": f})
         # check if the upload was successful
+        print(upload_response.json())
         upload_response.raise_for_status()
         print(f"Uploaded {pdf_file} successfully.")
 
