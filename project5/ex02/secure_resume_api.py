@@ -120,6 +120,7 @@ def search():
     print(f"\n\n\n\n\nRESULTS: {results}\n\n\n\n\n")
     response_data = []
     for i, result in enumerate(results["ids"][0]):
+        print(f"\n\n\n\nid: {result}\n\n\n\n")
         content = results["documents"][0][i].replace("\n", "").replace("•", "")
         if query in content:
             response_data.append(
@@ -137,7 +138,7 @@ def search():
 
 
 @app.route("/upload_pdf", methods=["POST"])
-@limiter.limit("5/minute")
+@limiter.limit("45/minute")
 @jwt_required()
 @role_required(["candidate", "administrator"])
 def upload_file():
@@ -188,14 +189,20 @@ def upload_file():
     return jsonify({"error": "Invalid file type"}), 400
 
 
-@app.route("/curriculum/<string:document_id>", methods=["DELETE"])
+@app.route("/curriculum/<string:filename>", methods=["DELETE"])
 @role_required(["administrator"])
-def delete_curriculum(document_id):
+def delete_curriculum(filename):
+    collection = chroma_client.get_or_create_collection("curriculos")
+    ids = collection.get(include=[])["ids"]
+    if not any(filename in doc_id.split("_chunk_")[0] for doc_id in ids):
+        return jsonify({"message": "Curriculum Not Found Within Database"}), 200
     try:
-        collection.delete(where={"source": document_id})
-        return jsonify({"message": "Curriculum deleted successfully"})
+        for doc_id in ids:
+            if filename in doc_id:
+                collection.delete(ids=[doc_id])
+        return jsonify({"message": "Curriculum deleted successfully"}), 200
     except:
-        return jsonify({"message": "Error at deletion"})
+        return jsonify({"message": "Error deleting document"}), 500
 
 
 @app.route("/user_info", methods=["GET"])
@@ -243,4 +250,4 @@ def add_security_headers(response):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
