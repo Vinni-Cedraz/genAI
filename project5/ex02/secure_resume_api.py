@@ -126,6 +126,7 @@ def search():
                 "document": result.split("_chunk_")[0],
                 "chunk": int(result.split("_chunk_")[1]),
                 "content": content,
+                "candidate": ""
             }
         )
 
@@ -164,7 +165,7 @@ def upload_file():
             for page_num in range(len(pdf_reader.pages)):
                 text += pdf_reader.pages[page_num].extract_text()
 
-            splitter = RecursiveCharacterTextSplitter(chunk_size=1000, separators=[" "])
+            splitter = RecursiveCharacterTextSplitter(chunk_size=700, separators=[" "])
             chunks = splitter.split_text(text)
 
             # Store chunks in ChromaDB
