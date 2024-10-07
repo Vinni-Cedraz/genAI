@@ -1,6 +1,8 @@
 #!/usr/bin/env python3.10
 import requests
 import json
+import chromadb
+from chromadb.utils import embedding_functions
 
 # API URL
 api_url = "http://127.0.0.1:5000"

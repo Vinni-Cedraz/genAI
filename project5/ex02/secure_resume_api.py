@@ -32,6 +32,7 @@ app.config["JWT_SECRET_KEY"] = "your-secret-key"  # Change this!
 jwt = JWTManager(app)
 limiter = Limiter(get_remote_address, app=app, default_limits=["50 per minute"])
 
+# chromadb setup:
 persist_directory = "./chroma_data"
 chroma_client = chromadb.PersistentClient(path=persist_directory)
 func = embedding_functions.SentenceTransformerEmbeddingFunction(
