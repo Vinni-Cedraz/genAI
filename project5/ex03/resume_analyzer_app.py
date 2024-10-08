@@ -22,8 +22,8 @@ def query_groq(prompt):
 if "access_token" not in st.session_state:
     st.session_state.access_token = None
 # Initialize session state
-if "search_results" not in st.session_state:
-    st.session_state.search_results = None
+if "search" not in st.session_state:
+    st.session_state.search = None
 # Initialize session_state for files_to_be_uploaded
 if "files_to_be_uploaded" not in st.session_state:
     st.session_state.files_to_be_uploaded = True
@@ -86,15 +86,18 @@ if st.button("Pesquisar"):
         headers=headers,
     )
     if response.status_code == 200:
-        st.session_state.search_results = response.json()
+        st.session_state.search = response.json()
     else:
         st.error("Erro ao realizar a pesquisa")
 
     # RETRIEVAL AUGMENTED GENERATION:
     # create prompt
-    if st.session_state.search_results is not None:
+    candidates = list(set(res["name"] for res in st.session_state.search))
+    st.write(f"Candidatos encontrados: {', '.join(candidates)}")
+
+    if st.session_state.search is not None:
         context = " ".join(
-            [result["content"] for result in st.session_state.search_results]
+            [result["content"] for result in st.session_state.search]
         )
 
     sys_prompt = f"""
@@ -124,7 +127,7 @@ if st.button("Pesquisar"):
     </query>
     """
 
-    if not st.session_state.search_results:
+    if not st.session_state.search:
         st.write(
             """The candidate's resume doesn't have
             any content related to your query"""
