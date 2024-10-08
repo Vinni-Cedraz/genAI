@@ -1,6 +1,5 @@
 #!/usr/bin/env python3.10
 from flask import Flask, request, jsonify
-from werkzeug.utils import secure_filename
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_jwt_extended import (
@@ -44,6 +43,21 @@ collection = chroma_client.get_or_create_collection(
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def get_response_data(results) -> list:
+    response_data = []
+    for i, result in enumerate(results["ids"][0]):
+        content = results["documents"][0][i].replace("\n", " ").replace("•", " ")
+        response_data.append(
+            {
+                "document": result.split("_chunk_")[0],
+                "chunk": int(result.split("_chunk_")[1]),
+                "content": content,
+            }
+        )
+    return response_data
+
 
 # Mock user database (replace with a real database in production)
 users = {
@@ -118,22 +132,7 @@ def register():
 def search():
     query = request.args.get("query")
     results = collection.query(query_texts=[query], where_document={"$contains": query})
-    response_data = []
-    for i, result in enumerate(results["ids"][0]):
-        content = results["documents"][0][i].replace("\n", " ").replace("•", " ")
-        response_data.append(
-            {
-                "document": result.split("_chunk_")[0],
-                "chunk": int(result.split("_chunk_")[1]),
-                "content": content,
-                "candidate": ""
-            }
-        )
-
-    print("Response:", json.dumps(response_data, indent=2, ensure_ascii=False))
-    response = jsonify(response_data)
-    response.headers["Content-Type"] = "application/json; charset=utf-8"
-    return response, 200
+    return get_response_data(results), 200
 
 
 @app.route("/upload_pdf", methods=["POST"])
@@ -141,9 +140,6 @@ def search():
 @jwt_required()
 @role_required(["candidate", "administrator"])
 def upload_file():
-    current_user = get_jwt_identity()
-    user_id = users[current_user]["id"]
-
     if "file" not in request.files:
         return jsonify({"error": "No file part"}), 400
     file = request.files["file"]
@@ -199,7 +195,7 @@ def delete_curriculum(filename):
             if filename in doc_id:
                 collection.delete(ids=[doc_id])
         return jsonify({"message": "Curriculum deleted successfully"}), 200
-    except:
+    except Exception:
         return jsonify({"message": "Error deleting document"}), 500
 
 
@@ -218,19 +214,14 @@ def user_info():
     )
 
 
-@app.route("/document_ids", methods=["GET"])
+@app.route("/labeled", methods=["GET"])
 @jwt_required()
-@role_required(["administrator"])
-def get_document_ids():
+def get_labeled_chunks():
     # Query the database
     collection = chroma_client.get_or_create_collection(name="curriculos")
-    # get all document IDs
-    document_ids = collection.get(include=[])["ids"]
-    # Remove the chunk number from the IDs
-    document_ids = [id.split("_chunk_")[0] for id in document_ids]
-    # Remove duplicates
-    document_ids = list(set(document_ids))
-    return jsonify(document_ids), 200
+    x = collection.get(include=["documents"])
+    print(f"Response: {json.dumps(x, indent=2, ensure_ascii=False)}")
+    return jsonify(x), 200
 
 
 @app.errorhandler(TooManyRequests)
