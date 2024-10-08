@@ -45,20 +45,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def get_response_data(results) -> list:
-    response_data = []
-    for i, result in enumerate(results["ids"][0]):
-        content = results["documents"][0][i].replace("\n", " ").replace("•", " ")
-        response_data.append(
-            {
-                "document": result.split("_chunk_")[0],
-                "chunk": int(result.split("_chunk_")[1]),
-                "content": content,
-            }
-        )
-    return response_data
-
-
 # Mock user database (replace with a real database in production)
 users = {
     "admin@example.com": {
@@ -124,15 +110,6 @@ def register():
         "id": str(uuid.uuid4()),
     }  # Set role of new user
     return jsonify({"msg": "User registered successfully"}), 201
-
-
-@app.route("/search", methods=["GET"])
-@limiter.limit("50/minute")
-@jwt_required()
-def search():
-    query = request.args.get("query")
-    results = collection.query(query_texts=[query], where_document={"$contains": query})
-    return get_response_data(results), 200
 
 
 @app.route("/upload_pdf", methods=["POST"])
@@ -214,14 +191,34 @@ def user_info():
     )
 
 
+def format_response_data(results) -> list:
+    response_data = []
+    for i, result in enumerate(results["ids"][0]):
+        content = results["documents"][0][i].replace("\n", " ").replace("•", " ")
+        response_data.append(
+            {
+                "document": result.split("_chunk_")[0],
+                "chunk": int(result.split("_chunk_")[1]),
+                "content": content,
+            }
+        )
+    return response_data
+
+
+@app.route("/search", methods=["GET"])
+@limiter.limit("50/minute")
+@jwt_required()
+def search():
+    query = request.args.get("query")
+    results = collection.query(query_texts=[query], where_document={"$contains": query})
+    return format_response_data(results), 200
+
+
 @app.route("/labeled", methods=["GET"])
 @jwt_required()
 def get_labeled_chunks():
-    # Query the database
-    collection = chroma_client.get_or_create_collection(name="curriculos")
-    x = collection.get(include=["documents"])
-    print(f"Response: {json.dumps(x, indent=2, ensure_ascii=False)}")
-    return jsonify(x), 200
+    results = format_response_data(collection.get(include=[]))
+    return results, 200
 
 
 @app.errorhandler(TooManyRequests)

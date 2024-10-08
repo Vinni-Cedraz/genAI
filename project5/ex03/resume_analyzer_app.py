@@ -1,7 +1,6 @@
 #!/usr/bin/env python3.10
 import streamlit as st
 import requests
-import json
 import os
 from groq import Groq
 
@@ -101,13 +100,18 @@ if st.button("Pesquisar"):
     sys_prompt = f"""
     Follow the intructions within the xml tags below:
     <role>
-        You are a resume analyzer, you answer queries about the resume of a candidate.
+        You are a resume analyzer, you answer queries about the resume of
+        a candidate.
     </role>
     <rules>
     - The context is a chunk of the resume of a candidate.
-    - Provide an answer based on the information found about the query within the context.
-    - If the answer is not available in the context, respond with 'I don't know'.
-    - If the user asks for something outside of the context of curriculum analysis, politely decline the request and guide them back to the main topic.
+    - Provide an answer based on the information found about the query within
+    the context.
+    - If the answer is not available in the context, respond with
+    'I don't know'.
+    - If the user asks for something outside of the context of curriculum
+    analysis, politely decline the request and guide them back to
+    the main topic.
     - Do not ask follow up questions.
     - Start your answers with "The candidate "
     - Never use xml tags on your answers.
@@ -121,7 +125,10 @@ if st.button("Pesquisar"):
     """
 
     if not st.session_state.search_results:
-        st.write("The candidate's resume doesn't have any content related to your query")
+        st.write(
+            """The candidate's resume doesn't have
+            any content related to your query"""
+        )
     else:
         # feed the result of the search to the model as context
         llm_response = query_groq(sys_prompt)

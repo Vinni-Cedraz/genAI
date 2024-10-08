@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.10
 import requests
+import json
 
 # API URL
 api_url = "http://127.0.0.1:5000"
@@ -21,4 +22,4 @@ with open('resumes/curriculo_1.pdf', 'rb') as f:
 
 response = requests.get(f"{api_url}/labeled", headers={"Authorization": f"Bearer {access_token}"})
 
-
+print("Response:", json.dumps(response.json(), indent=2, ensure_ascii=False))
