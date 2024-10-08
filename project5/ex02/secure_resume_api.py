@@ -191,7 +191,12 @@ def user_info():
     )
 
 
-def format_response_data(results) -> list:
+@app.route("/search", methods=["GET"])
+@limiter.limit("50/minute")
+@jwt_required()
+def search():
+    query = request.args.get("query")
+    results = collection.query(query_texts=[query], where_document={"$contains": query})
     response_data = []
     for i, result in enumerate(results["ids"][0]):
         content = results["documents"][0][i].replace("\n", " ").replace("•", " ")
@@ -202,22 +207,26 @@ def format_response_data(results) -> list:
                 "content": content,
             }
         )
-    return response_data
 
-
-@app.route("/search", methods=["GET"])
-@limiter.limit("50/minute")
-@jwt_required()
-def search():
-    query = request.args.get("query")
-    results = collection.query(query_texts=[query], where_document={"$contains": query})
-    return format_response_data(results), 200
+    return jsonify(response_data), 200
 
 
 @app.route("/labeled", methods=["GET"])
 @jwt_required()
 def get_labeled_chunks():
-    results = format_response_data(collection.get(include=[]))
+    results = collection.get(include=["documents"])
+    response_data = []
+    for i, result in enumerate(results["ids"]):
+        content = results["documents"][i].replace("\n", " ").replace("•", " ")
+        response_data.append(
+            {
+                "document": result.split("_chunk_")[0],
+                "chunk": int(result.split("_chunk_")[1]),
+                "content": content,
+            }
+        )
+
+    return jsonify(response_data), 200
     return results, 200
 
 
