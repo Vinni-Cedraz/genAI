@@ -18,6 +18,7 @@ import uuid
 import logging
 import json
 from werkzeug.exceptions import TooManyRequests
+from groq import Groq
 
 UPLOAD_FOLDER = "./pdfs_posted/"
 ALLOWED_EXTENSIONS = {"pdf"}
@@ -211,6 +212,15 @@ def search():
     return jsonify(response_data), 200
 
 
+def query_groq(prompt):
+    client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+    chat_completion = client.chat.completions.create(
+        messages=[{"role": "user", "content": prompt}],
+        model="llama3-8b-8192",
+    )
+    return chat_completion.choices[0].message.content
+
+
 @app.route("/labeled", methods=["GET"])
 @jwt_required()
 def get_labeled_chunks():
@@ -223,8 +233,41 @@ def get_labeled_chunks():
                 "document": result.split("_chunk_")[0],
                 "chunk": int(result.split("_chunk_")[1]),
                 "content": content,
+                "name": "",
             }
         )
+
+    for chunk in response_data:
+        if chunk["chunk"] == 1:
+            name = query_groq(
+                f"""In the given chunk of text, Identify the name of the
+                candidate, filtering out any extra information and return
+                only their name and nothing else. Follow the example and
+                do not include any extra information, only answer with
+                a name and absolutely no other words, be extremely
+                concise.
+                <chunk>
+                    {chunk["content"]}
+                </chunk>
+                <example>
+                    <chunk>
+                        "Diego Martins São Paulo, SP | (11) 9XXXX-XXXX | diego.martins@42sp.org.br Resumo Profissional Como Senior Cybersecurity Specialist, tenho 10 anos de experiência em liderar equipes de segurança  e  desenvolver  soluções  inovadoras  para  proteger  sistemas  e  dados.  Minha missão  é  utilizar  minhas  habilidades  técnicas  e  gerenciais  para  ajudar  organizações"
+                    </chunk>
+                    <your-answer>
+                        Diego Martins
+                    </your-answer>
+                </example>
+                """
+            )
+            chunk["name"] = name
+
+    for chunk in response_data:
+        if chunk["name"] != "":
+            name = chunk["name"]
+            doc_id = chunk["document"]
+            for chunk in response_data:
+                if chunk["document"] == doc_id:
+                    chunk["name"] = name
 
     return jsonify(response_data), 200
     return results, 200
