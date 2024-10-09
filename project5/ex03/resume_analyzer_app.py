@@ -95,10 +95,10 @@ if st.button("Pesquisar"):
     candidates = list(set(res["name"] for res in st.session_state.search))
     st.write(f"Candidatos encontrados: {', '.join(candidates)}")
 
-    # content_grouped_by_candidate_name = defaultdict(list)
-    # for item in candidates:
-    #     content_grouped_by_candidate_name[item["name"]].append(item["content"])
-    # print(f"dict ${content_grouped_by_candidate_name}")
+    content_grouped_by_candidate_name = defaultdict(list)
+    for chnk in st.session_state.search:
+        content_grouped_by_candidate_name[chnk["name"]].append(chnk["content"])
+    print(f"dict ${content_grouped_by_candidate_name}")
 
     if st.session_state.search is not None:
         context = " ".join([result["content"] for result in st.session_state.search])

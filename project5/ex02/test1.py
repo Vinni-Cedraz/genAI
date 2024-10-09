@@ -2,7 +2,6 @@
 import requests
 import os
 import json
-import groq
 
 # API URL
 api_url = "http://127.0.0.1:5000"
@@ -54,5 +53,15 @@ query_response = requests.get(
     headers={"Authorization": f"Bearer {access_token}"},
 )
 
-# print(query_response.text)
-print("Response:", json.dumps(query_response.json(), indent=2, ensure_ascii=False))
+# Test for the presence of "Python" in each dictionary's content
+response_data = query_response.json()
+total_tests = len(response_data)
+passed_tests = 0
+
+for item in response_data:
+    if "Python" in item["content"]:
+        passed_tests += 1
+
+print("Response:\n\n\n", json.dumps(query_response.json(), indent=2, ensure_ascii=False))
+
+print(f"passed {passed_tests} out of {total_tests} tests")

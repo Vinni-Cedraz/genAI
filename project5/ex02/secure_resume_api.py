@@ -16,7 +16,6 @@ from chromadb.utils import embedding_functions
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import uuid
 import logging
-import json
 from werkzeug.exceptions import TooManyRequests
 from groq import Groq
 
@@ -114,7 +113,7 @@ def register():
 
 
 @app.route("/upload_pdf", methods=["POST"])
-@limiter.limit("20/minute")
+@limiter.limit("50/minute")
 @jwt_required()
 @role_required(["candidate", "administrator"])
 def upload_file():
@@ -139,7 +138,9 @@ def upload_file():
             for page_num in range(len(pdf_reader.pages)):
                 text += pdf_reader.pages[page_num].extract_text()
 
-            splitter = RecursiveCharacterTextSplitter(chunk_size=700, separators=[" "])
+            splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000, chunk_overlap=500, separators=[" ", "\n", "."]
+            )
             chunks = splitter.split_text(text)
 
             # Store chunks in ChromaDB
@@ -197,7 +198,7 @@ def user_info():
 @jwt_required()
 def search():
     query = request.args.get("query")
-    results = collection.query(query_texts=[query], where_document={"$contains": query})
+    results = collection.query(query_texts=[query], n_results=20)
     labeled = create_labeled_chunks()
     doc_name_dict = {d["document"]: d["name"] for d in labeled}
     response_data = []
