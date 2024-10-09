@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python3.12
 from flask import Flask, request, jsonify
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -198,14 +198,18 @@ def user_info():
 def search():
     query = request.args.get("query")
     results = collection.query(query_texts=[query], where_document={"$contains": query})
+    labeled = create_labeled_chunks()
+    doc_name_dict = {d["document"]: d["name"] for d in labeled}
     response_data = []
     for i, result in enumerate(results["ids"][0]):
         content = results["documents"][0][i].replace("\n", " ").replace("•", " ")
+        document = result.split("_chunk_")[0]
         response_data.append(
             {
-                "document": result.split("_chunk_")[0],
+                "document": document,
                 "chunk": int(result.split("_chunk_")[1]),
                 "content": content,
+                "name": doc_name_dict[document],
             }
         )
 
@@ -221,9 +225,7 @@ def query_groq(prompt):
     return chat_completion.choices[0].message.content
 
 
-@app.route("/labeled", methods=["GET"])
-@jwt_required()
-def get_labeled_chunks():
+def create_labeled_chunks():
     results = collection.get(include=["documents"])
     response_data = []
     for i, result in enumerate(results["ids"]):
@@ -268,9 +270,13 @@ def get_labeled_chunks():
             for chunk in response_data:
                 if chunk["document"] == doc_id:
                     chunk["name"] = name
+    return response_data
 
-    return jsonify(response_data), 200
-    return results, 200
+
+@app.route("/labeled", methods=["GET"])
+@jwt_required()
+def get_labeled_chunks():
+    return jsonify(create_labeled_chunks()), 200
 
 
 @app.errorhandler(TooManyRequests)

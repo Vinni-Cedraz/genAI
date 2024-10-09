@@ -3,7 +3,7 @@ import streamlit as st
 import requests
 import os
 from groq import Groq
-
+from collections import defaultdict
 
 st.title("Análise de currículos")
 api_url = "http://127.0.0.1:5000"
@@ -91,14 +91,17 @@ if st.button("Pesquisar"):
         st.error("Erro ao realizar a pesquisa")
 
     # RETRIEVAL AUGMENTED GENERATION:
-    # create prompt
+
     candidates = list(set(res["name"] for res in st.session_state.search))
     st.write(f"Candidatos encontrados: {', '.join(candidates)}")
 
+    # content_grouped_by_candidate_name = defaultdict(list)
+    # for item in candidates:
+    #     content_grouped_by_candidate_name[item["name"]].append(item["content"])
+    # print(f"dict ${content_grouped_by_candidate_name}")
+
     if st.session_state.search is not None:
-        context = " ".join(
-            [result["content"] for result in st.session_state.search]
-        )
+        context = " ".join([result["content"] for result in st.session_state.search])
 
     sys_prompt = f"""
     Follow the intructions within the xml tags below:
