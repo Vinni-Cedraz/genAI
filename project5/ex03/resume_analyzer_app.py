@@ -77,6 +77,15 @@ else:
     st.write("Please log in to upload files.")
 
 
+def create_xml_context(data):
+    result = ""
+    for name, content_list in data.items():
+        content = " ".join(content_list)
+        content = content.strip()
+        result += f"<{name}_skills>{content}</{name}_skills>"
+    return result
+
+
 # SEMANTIC SEARCH:
 search_query = st.text_input("Pesquisar por habilidades:")
 if st.button("Pesquisar"):
@@ -90,52 +99,60 @@ if st.button("Pesquisar"):
     else:
         st.error("Erro ao realizar a pesquisa")
 
-    # RETRIEVAL AUGMENTED GENERATION:
-
     candidates = list(set(res["name"] for res in st.session_state.search))
-    st.write(f"Candidatos encontrados: {', '.join(candidates)}")
+    st.write(
+        f"Os seguintes candidatos possuem habilidades em {
+            search_query}: {', '.join(candidates)}"
+    )
 
     content_grouped_by_candidate_name = defaultdict(list)
     for chnk in st.session_state.search:
         content_grouped_by_candidate_name[chnk["name"]].append(chnk["content"])
-    print(f"dict ${content_grouped_by_candidate_name}")
 
-    if st.session_state.search is not None:
-        context = " ".join([result["content"] for result in st.session_state.search])
+    context = create_xml_context(content_grouped_by_candidate_name)
 
+    print("xml context: " + context)
     sys_prompt = f"""
     Follow the intructions within the xml tags below:
     <role>
-        You are a resume analyzer, you answer queries about the resume of
-        a candidate.
+        You are a text sumarizer, you sumarize the skills
+        each candidate has, mentioning all of the candidates by name.
     </role>
     <rules>
-    - The context is a chunk of the resume of a candidate.
-    - Provide an answer based on the information found about the query within
-    the context.
-    - If the answer is not available in the context, respond with
-    'I don't know'.
-    - If the user asks for something outside of the context of curriculum
-    analysis, politely decline the request and guide them back to
-    the main topic.
+    - All of the candidates listed, along with their skills,
+    must be present in your answer.
+    - Your answer will ALWAYS be in Brazilian Portuguese.
+    - Always start your answers with: "Resumo das habilidades em <query> de cada candidato:"
+    - The query will be a skill, such as "Python" or "leadership", if it's not,
+    politely decline the request and guide them back to
+    the main topic of candidate skills.
     - Do not ask follow up questions.
-    - Start your answers with "The candidate "
-    - Never use xml tags on your answers.
+    - Your context will in the following format:
+    <candidate_name_skills>text here</candidate_name_skills>
+    those are xml tags.
+    - The context is in this xml format to help you know which skills
+    belong to each candidate.
+    - You must never use xml tags on your answers.
     </rules>
+    <candidates>
+        {candidates}
+    </candidates>
     <context>
         {context}
     </context>
     <query>
         {search_query}
     </query>
+    <example>
+        <query>
+            Python
+        </query>
+        <begining_of_your_answer>
+            Resumo das habilidades em Python de cada candidato:
+        </begining_of_your_answer>
+    </example>
     """
 
-    if not st.session_state.search:
-        st.write(
-            """The candidate's resume doesn't have
-            any content related to your query"""
-        )
-    else:
-        # feed the result of the search to the model as context
-        llm_response = query_groq(sys_prompt)
-        st.write(llm_response)
+    # feed the result of the search to the model as context
+    llm_response = query_groq(sys_prompt)
+    st.write(llm_response)

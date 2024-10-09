@@ -29,7 +29,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["JWT_SECRET_KEY"] = "your-secret-key"  # Change this!
 
 jwt = JWTManager(app)
-limiter = Limiter(get_remote_address, app=app, default_limits=["50 per minute"])
+limiter = Limiter(get_remote_address, app=app, default_limits=["12 per minute"])
 
 # chromadb setup:
 persist_directory = "./chroma_data"
@@ -113,7 +113,7 @@ def register():
 
 
 @app.route("/upload_pdf", methods=["POST"])
-@limiter.limit("50/minute")
+@limiter.limit("12/minute")
 @jwt_required()
 @role_required(["candidate", "administrator"])
 def upload_file():
@@ -194,7 +194,7 @@ def user_info():
 
 
 @app.route("/search", methods=["GET"])
-@limiter.limit("50/minute")
+@limiter.limit("12/minute")
 @jwt_required()
 def search():
     query = request.args.get("query")
