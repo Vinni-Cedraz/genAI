@@ -99,12 +99,6 @@ if st.button("Pesquisar"):
     else:
         st.error("Erro ao realizar a pesquisa")
 
-    candidates = list(set(res["name"] for res in st.session_state.search))
-    st.write(
-        f"Os seguintes candidatos possuem habilidades em {
-            search_query}: {', '.join(candidates)}"
-    )
-
     content_grouped_by_candidate_name = defaultdict(list)
     for chnk in st.session_state.search:
         content_grouped_by_candidate_name[chnk["name"]].append(chnk["content"])
@@ -113,46 +107,70 @@ if st.button("Pesquisar"):
 
     print("xml context: " + context)
     sys_prompt = f"""
-    Follow the intructions within the xml tags below:
-    <role>
-        You are a text sumarizer, you sumarize the skills
-        each candidate has, mentioning all of the candidates by name.
-    </role>
-    <rules>
-    - All of the candidates listed, along with their skills,
-    must be present in your answer.
-    - Your answer will ALWAYS be in Brazilian Portuguese.
-    - Always start your answers with: "Resumo das habilidades em <query> de cada candidato:"
-    - The query will be a skill, such as "Python" or "leadership", if it's not,
-    politely decline the request and guide them back to
-    the main topic of candidate skills.
-    - Do not ask follow up questions.
-    - Your context will in the following format:
-    <candidate_name_skills>text here</candidate_name_skills>
-    those are xml tags.
-    - The context is in this xml format to help you know which skills
-    belong to each candidate.
-    - You must never use xml tags on your answers.
-    </rules>
-    <candidates>
-        {candidates}
-    </candidates>
-    <context>
-        {context}
-    </context>
-    <query>
-        {search_query}
-    </query>
-    <example>
+        Follow the intructions within the xml tags below:
+        <role>
+            You are a resume analyzer machine. You'll receive a query and
+            a context. The context has candidates with skills that are probably
+            related to the query. Look for the candidates that have the skill
+            specified by the query and sumarize their skills.
+        </role>
+        <rules>
+        - Completely ignore the candidates that don't have the skill
+        specified by the query. Don't mention their names AT ALL.
+        - The query should be a skill, such as "Python" or "leadership", if
+        it's not a skill, politely decline the request and guide them back to
+        the main topic: candidate skills.
+        - Your answer will ALWAYS be in Brazilian Portuguese.
+        - Always start your answers with: "Resumo das habilidades em
+        <query> de cada candidato:", unless the query is not related to the
+        main topic.
+        - Do not ask follow up questions.
+        - You'll receive context in the following format:
+        <candidate_name><skills>text here</skills></candidate_name>
+        - You should follow the examples.
+        </rules>
+        <context>
+            {context}
+        </context>
         <query>
-            Python
+            {search_query}
         </query>
-        <begining_of_your_answer>
-            Resumo das habilidades em Python de cada candidato:
-        </begining_of_your_answer>
-    </example>
-    """
-
+        <examples>
+        <correct_query_example>
+            <query>
+               Java
+            </query>
+            <your_answer>
+                Resumo das habilidades em Java de cada candidato:
+                    ...rest of the answer....
+            </your_answer>
+        </correct_query_example>
+        <unrelated_query_example>
+            <query>
+                Quem foi Thomas Jefferson?
+            </query>
+            <your_answer>
+                Por favor, apenas faça perguntas sobre as
+                habilidades dos candidatos.
+            </your_answer>
+        </unrelated_query_example>
+        </examples>
+        <VERY_IMPORTANT_INSTRUCTION>
+            Suppose you have a context with 10 candidate names but you don't
+            find the query skills in three of them: Lucas Alves, Ana Costa and
+            Silvana Reis. In that case, those three names should not be present
+            in your answer at all. So the following sentences would be
+            unacceptable to be found in your answer:
+            <answer>
+                Lucas Alves: Não menciona habilidades em Python.
+                Ana Costa: Não menciona habilidades em Python.
+                Silvana Reis: Nenhuma informação sobre Python foi encontrada em
+                seu currículo.
+            </answer>
+            Because if a candidate doesn't mention a query skill, your should
+            completely ignore that candidate, not mentioning their name at all.
+        </VERY_IMPORTANT_INSTRUCTION>
+        """
     # feed the result of the search to the model as context
     llm_response = query_groq(sys_prompt)
     st.write(llm_response)
