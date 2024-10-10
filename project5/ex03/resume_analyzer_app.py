@@ -167,7 +167,7 @@ if st.button("Pesquisar"):
                 Silvana Reis: Nenhuma informação sobre Python foi encontrada em
                 seu currículo.
             </answer>
-            Because if a candidate doesn't mention a query skill, your should
+            Because if a candidate doesn't mention a query skill, you should
             completely ignore that candidate, not mentioning their name at all.
         </VERY_IMPORTANT_INSTRUCTION>
         """
