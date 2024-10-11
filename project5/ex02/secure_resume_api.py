@@ -139,7 +139,7 @@ def upload_file():
                 text += pdf_reader.pages[page_num].extract_text()
 
             splitter = RecursiveCharacterTextSplitter(
-                chunk_size=1000, chunk_overlap=500, separators=[" ", "\n", "."]
+                chunk_size=600, chunk_overlap=300, separators=[" ", "\n", "."]
             )
             chunks = splitter.split_text(text)
 
@@ -198,7 +198,7 @@ def user_info():
 @jwt_required()
 def search():
     query = request.args.get("query")
-    results = collection.query(query_texts=[query], n_results=20)
+    results = collection.query(query_texts=[query], n_results=7)
     labeled = create_labeled_chunks()
     doc_name_dict = {d["document"]: d["name"] for d in labeled}
     response_data = []
@@ -221,7 +221,7 @@ def query_groq(prompt):
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     chat_completion = client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
-        model="llama3-8b-8192",
+        model="llama-3.1-8b-instant"
     )
     return chat_completion.choices[0].message.content
 

@@ -51,7 +51,8 @@ if "sumarizer" not in st.session_state:
         main topic.
         - Do not ask follow up questions.
         - You'll receive context in the following format:
-        <candidate_name>text here</candidate_name>
+        <candidate_name>text here with each different chunk of skills separated in
+        xml tags</candidate_name>
         - You should follow the examples.
         - No extra text should be added before "Resumo das habilidades...".
         - No extra text should be added after the sumary of the last candidate.
@@ -322,7 +323,12 @@ else:
 def create_xml_context(data):
     result = ""
     for name, content_list in data.items():
-        content = " ".join(content_list)
+        content = "".join(
+            [
+                f"<chunk{i+1}>{chunk}</chunk{i+1}>"
+                for i, chunk in enumerate(content_list)
+            ]
+        )
         content = content.strip()
         result += f"<{name}>{content}</{name}>"
     return result
@@ -338,51 +344,52 @@ if st.button("Pesquisar"):
     )
     if response.status_code == 200:
         st.session_state.search = response.json()
+    if not st.session_state.search:
+        st.error("Erro ao realizar a pesquisa, faça upload dos currículos.")
     else:
-        st.error("Erro ao realizar a pesquisa")
 
-    content_grouped_by_candidate_name = defaultdict(list)
-    for chnk in st.session_state.search:
-        content_grouped_by_candidate_name[chnk["name"]].append(chnk["content"])
+        grouped = defaultdict(list)
+        for chnk in st.session_state.search:
+            grouped[chnk["name"]].append(chnk["content"])
 
-    context = create_xml_context(content_grouped_by_candidate_name)
+        context = create_xml_context(grouped)
 
-    print("xml context: " + context)
-    user_prompt = f"""
-        <context>
-            {context}
-        </context>
-        <query>
-            {search_query}
-        </query>"""
+        print("xml context: " + context)
+        user_prompt = f"""
+            <context>
+                {context}
+            </context>
+            <query>
+                {search_query}
+            </query>"""
 
-    llm_response = query_groq(st.session_state.sumarizer, user_prompt)
-    user_prompt = f"""
-        <context>
-            {context}
-        </context>
-        <query>
-            {search_query}
-        </query>
-        <ai_response>
-            {llm_response}
-        </ai_response>
+        llm_response = query_groq(st.session_state.sumarizer, user_prompt)
+        user_prompt = f"""
+            <context>
+                {context}
+            </context>
+            <query>
+                {search_query}
+            </query>
+            <ai_response>
+                {llm_response}
+            </ai_response>
+            """
+        improved_response = query_groq(st.session_state.reviewer, user_prompt)
+
+        user_prompt = f"""
+            <input_to_be_cleaned>
+                {improved_response}
+            </input_to_be_cleaned>
         """
-    improved_response = query_groq(st.session_state.reviewer, user_prompt)
 
-    user_prompt = f"""
-        <input_to_be_cleaned>
-            {improved_response}
-        </input_to_be_cleaned>
-    """
+        cleaned = query_groq(st.session_state.cleaner, user_prompt)
 
-    cleaned = query_groq(st.session_state.cleaner, user_prompt)
+        user_prompt = f"""
+            <input_to_be_cleaned>
+                {cleaned}
+            </input_to_be_cleaned>
+        """
 
-    user_prompt = f"""
-        <input_to_be_cleaned>
-            {cleaned}
-        </input_to_be_cleaned>
-    """
-
-    cleaned_twice = query_groq(st.session_state.second_cleaner, user_prompt)
-    st.write(cleaned_twice)
+        cleaned_twice = query_groq(st.session_state.second_cleaner, user_prompt)
+        st.write(cleaned_twice)
