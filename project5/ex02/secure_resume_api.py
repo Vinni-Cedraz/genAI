@@ -113,7 +113,7 @@ def register():
 
 
 @app.route("/upload_pdf", methods=["POST"])
-@limiter.limit("12/minute")
+@limiter.limit("50/minute")
 @jwt_required()
 @role_required(["candidate", "administrator"])
 def upload_file():
@@ -139,7 +139,7 @@ def upload_file():
                 text += pdf_reader.pages[page_num].extract_text()
 
             splitter = RecursiveCharacterTextSplitter(
-                chunk_size=600, chunk_overlap=300, separators=[" ", "\n", "."]
+                chunk_size=1000, chunk_overlap=500, separators=[" ", "\n", "."]
             )
             chunks = splitter.split_text(text)
 
@@ -198,30 +198,36 @@ def user_info():
 @jwt_required()
 def search():
     query = request.args.get("query")
-    results = collection.query(query_texts=[query], n_results=7)
+    meta = collection.get(include=["metadatas"])["metadatas"]
+    meta = set(d["source"] for d in meta)
+    response_data = []
     labeled = create_labeled_chunks()
     doc_name_dict = {d["document"]: d["name"] for d in labeled}
-    response_data = []
-    for i, result in enumerate(results["ids"][0]):
-        content = results["documents"][0][i].replace("\n", " ").replace("•", " ")
-        document = result.split("_chunk_")[0]
-        response_data.append(
-            {
-                "document": document,
-                "chunk": int(result.split("_chunk_")[1]),
-                "content": content,
-                "name": doc_name_dict[document],
-            }
+    for source in meta:
+        results = collection.query(
+            query_texts=[query], where={"source": source}, n_results=2
         )
+        for i, result in enumerate(results["ids"][0]):
+            document = result.split("_chunk_")[0]
+            content = results["documents"][0][i].replace("\n", " ").replace("•", " ")
+            response_data.append(
+                {
+                    "document": document,
+                    "content": content,
+                    "distance": results["distances"][0][i],
+                    "name": doc_name_dict[document],
+                    "chunk": int(result.split("_chunk_")[1]),
+                }
+            )
 
-    return jsonify(response_data), 200
+    response_data = sorted(response_data, key=lambda x: x["distance"])
+    return jsonify(response_data[:15]), 200
 
 
 def query_groq(prompt):
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     chat_completion = client.chat.completions.create(
-        messages=[{"role": "user", "content": prompt}],
-        model="llama-3.1-8b-instant"
+        messages=[{"role": "user", "content": prompt}], model="llama3-8b-8192"
     )
     return chat_completion.choices[0].message.content
 
