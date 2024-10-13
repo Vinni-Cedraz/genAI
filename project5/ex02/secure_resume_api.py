@@ -113,7 +113,7 @@ def register():
 
 
 @app.route("/upload_pdf", methods=["POST"])
-@limiter.limit("50/minute")
+@limiter.limit("10/minute")
 @jwt_required()
 @role_required(["candidate", "administrator"])
 def upload_file():
@@ -194,7 +194,7 @@ def user_info():
 
 
 @app.route("/search", methods=["GET"])
-@limiter.limit("12/minute")
+@limiter.limit("2/minute")
 @jwt_required()
 def search():
     query = request.args.get("query")
@@ -221,7 +221,7 @@ def search():
             )
 
     response_data = sorted(response_data, key=lambda x: x["distance"])
-    return jsonify(response_data[:15]), 200
+    return jsonify(response_data), 200
 
 
 def query_groq(prompt):

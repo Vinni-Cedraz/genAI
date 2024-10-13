@@ -47,24 +47,64 @@ access_token = login_response.json()["access_token"]
 
 # print(f"access token: {access_token}")
 
-java_coders = [
-    "Diego Martins",
+python_list = [
     "Larissa Silva",
+    "Isabela Martins",
     "Bruno Carvalho",
+    "Diego Alves",
     "Gustavo Santos",
     "Bruno Costa",
+    "Rafael Oliveira",
+    "Gustavo Rodrigues",
+    "Pedro Carvalho",
+    "Mariana Ferreiro",
+    "Felipe Costa",
+    "Thiago Costa",
+    "Thiago Souza",
     "Beatriz Oliveira",
     "Pedro Lima",
+    "Bruno Lima",
     "Bruno Souza",
+    "Gustavo Lima",
     "Beatriz Gomes",
+    "Lucas Souza",
+    "Bruno Almeida",
+    "Lucas Alvez",
+    "Ana Costa",
+    "Diego Ribeiro",
+    "Juliana Gomes",
+    "Felipe Lima",
     "Juliana Ferreira",
     "Ana Ferreira",
     "Rafael Almeida",
     "Maria Almeida",
-    "Beatriz Ribeiro",
+    "Beatriz Ribeiro"
 ]
 
-query = "Java"
+python_list = list(set(python_list))
+
+
+coders = {
+    "Java": [
+        "Diego Martins",
+        "Larissa Silva",
+        "Bruno Carvalho",
+        "Gustavo Santos",
+        "Bruno Costa",
+        "Beatriz Oliveira",
+        "Pedro Lima",
+        "Bruno Souza",
+        "Beatriz Gomes",
+        "Juliana Ferreira",
+        "Ana Ferreira",
+        "Rafael Almeida",
+        "Maria Almeida",
+        "Beatriz Ribeiro",
+    ],
+    "Python": python_list
+}
+
+query = "Python"
 query_response = requests.get(
     f"{api_url}/search?query={query}",
     headers={"Authorization": f"Bearer {access_token}"},
@@ -73,7 +113,8 @@ query_response = requests.get(
 response_data = query_response.json()
 
 print(
-    "Response:\n\n\n", json.dumps(query_response.json(), indent=2, ensure_ascii=False)
+    "Response:\n\n\n", json.dumps(
+        query_response.json(), indent=2, ensure_ascii=False)
 )
 
 total_tests = len(response_data)
@@ -91,13 +132,12 @@ print(
 
 passed_tests = 0
 response_names = list(set(res["name"] for res in response_data))
-total_tests = len(response_names)
 
-for name in java_coders:
+for name in coders[query]:
     if name in response_names:
         passed_tests += 1
 
 print(
-    f"""expected to find {len(java_coders)} candidates in response, found {
-        passed_tests}"""
+    f"""completeness test: expected to find
+    {len(coders[query])} candidates in response, found {passed_tests}"""
 )
